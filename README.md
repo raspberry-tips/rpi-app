@@ -2,6 +2,14 @@
 
 Android App zum Auffinden von Raspberry Pis im Heimnetz – plus alle Tools von [raspberry.tips](https://raspberry.tips) direkt in der App.
 
+## Screenshots
+
+<p align="center">
+  <img src="screenshots/scanner.jpg" width="220" alt="IP Scanner">
+  <img src="screenshots/tools.jpg" width="220" alt="Tools">
+  <img src="screenshots/geraete.jpg" width="220" alt="Meine Geräte">
+</p>
+
 ## Features
 
 - **IP Scanner** – Findet Raspberry Pis automatisch per mDNS, MAC-Adress-Erkennung und Port-Scan
