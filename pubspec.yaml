@@ -9,6 +9,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.20.2
   webview_flutter: ^4.10.0
   url_launcher: ^6.3.1
   network_info_plus: ^6.0.1
@@ -31,6 +34,7 @@ flutter_launcher_icons:
   min_sdk_android: 21
 
 flutter:
+  generate: true
   uses-material-design: true
   assets:
     - assets/icon/

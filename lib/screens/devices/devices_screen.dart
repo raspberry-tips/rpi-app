@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../../models/device.dart';
 import '../../services/device_storage.dart';
 
@@ -31,25 +32,28 @@ class _DevicesScreenState extends State<DevicesScreen> {
         TextEditingController(text: device.customName ?? device.displayName);
     final result = await showDialog<String>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Gerät umbenennen'),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          decoration: const InputDecoration(labelText: 'Name'),
-          onSubmitted: (v) => Navigator.pop(context, v.trim()),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Abbrechen'),
+      builder: (context) {
+        final l = AppLocalizations.of(context)!;
+        return AlertDialog(
+          title: Text(l.renameDialogTitle),
+          content: TextField(
+            controller: controller,
+            autofocus: true,
+            decoration: InputDecoration(labelText: l.renameFieldLabel),
+            onSubmitted: (v) => Navigator.pop(context, v.trim()),
           ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, controller.text.trim()),
-            child: const Text('Speichern'),
-          ),
-        ],
-      ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(l.buttonCancel),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(context, controller.text.trim()),
+              child: Text(l.buttonSave),
+            ),
+          ],
+        );
+      },
     );
 
     if (result != null && result.isNotEmpty) {
@@ -61,20 +65,23 @@ class _DevicesScreenState extends State<DevicesScreen> {
   Future<void> _deleteDevice(Device device) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Gerät entfernen'),
-        content: Text('${device.displayName} wirklich aus der Liste entfernen?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Abbrechen'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Entfernen'),
-          ),
-        ],
-      ),
+      builder: (context) {
+        final l = AppLocalizations.of(context)!;
+        return AlertDialog(
+          title: Text(l.deleteDialogTitle),
+          content: Text(l.deleteDialogMessage(device.displayName)),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text(l.buttonCancel),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: Text(l.buttonRemove),
+            ),
+          ],
+        );
+      },
     );
 
     if (confirmed == true) {
@@ -99,12 +106,13 @@ class _DevicesScreenState extends State<DevicesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Meine Geräte'),
+        title: Text(l.devicesTitle),
       ),
       body: _devices.isEmpty
-          ? _buildEmptyState()
+          ? _buildEmptyState(l)
           : RefreshIndicator(
               onRefresh: _loadDevices,
               child: ListView.builder(
@@ -122,7 +130,7 @@ class _DevicesScreenState extends State<DevicesScreen> {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(AppLocalizations l) {
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -134,7 +142,7 @@ class _DevicesScreenState extends State<DevicesScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            'Noch keine Geräte gespeichert.\nNutze den Scanner um Raspberry Pis\nzu finden und zu speichern.',
+            l.devicesEmptyMessage,
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   color: Theme.of(context).colorScheme.outline,
@@ -164,6 +172,7 @@ class _DeviceTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l = AppLocalizations.of(context)!;
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: Padding(
@@ -201,7 +210,7 @@ class _DeviceTile extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    'Gesehen: ${_formatDate(device.lastSeen)}',
+                    l.deviceLastSeen(_formatDate(device.lastSeen)),
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.outline,
                     ),
@@ -222,12 +231,12 @@ class _DeviceTile extends StatelessWidget {
                     onDelete();
                 }
               },
-              itemBuilder: (_) => const [
+              itemBuilder: (_) => [
                 PopupMenuItem(
                   value: 'browser',
                   child: ListTile(
-                    leading: Icon(Icons.open_in_browser),
-                    title: Text('Browser öffnen'),
+                    leading: const Icon(Icons.open_in_browser),
+                    title: Text(l.menuOpenBrowser),
                     dense: true,
                     contentPadding: EdgeInsets.zero,
                   ),
@@ -235,8 +244,8 @@ class _DeviceTile extends StatelessWidget {
                 PopupMenuItem(
                   value: 'ssh',
                   child: ListTile(
-                    leading: Icon(Icons.terminal),
-                    title: Text('SSH öffnen'),
+                    leading: const Icon(Icons.terminal),
+                    title: Text(l.menuOpenSsh),
                     dense: true,
                     contentPadding: EdgeInsets.zero,
                   ),
@@ -244,8 +253,8 @@ class _DeviceTile extends StatelessWidget {
                 PopupMenuItem(
                   value: 'rename',
                   child: ListTile(
-                    leading: Icon(Icons.edit_outlined),
-                    title: Text('Umbenennen'),
+                    leading: const Icon(Icons.edit_outlined),
+                    title: Text(l.menuRename),
                     dense: true,
                     contentPadding: EdgeInsets.zero,
                   ),
@@ -253,8 +262,8 @@ class _DeviceTile extends StatelessWidget {
                 PopupMenuItem(
                   value: 'delete',
                   child: ListTile(
-                    leading: Icon(Icons.delete_outline),
-                    title: Text('Entfernen'),
+                    leading: const Icon(Icons.delete_outline),
+                    title: Text(l.menuDelete),
                     dense: true,
                     contentPadding: EdgeInsets.zero,
                   ),

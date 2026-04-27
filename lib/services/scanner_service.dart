@@ -8,7 +8,7 @@ import 'package:network_info_plus/network_info_plus.dart';
 import '../models/device.dart';
 
 class ScannerService {
-  static const List<int> _checkPorts = [22, 80, 443, 8080];
+  static const List<int> _defaultPorts = [22, 80, 443, 8080];
   static const List<String> _piHostnamePrefixes = ['raspberrypi', 'raspberry'];
   static const List<String> _piMacPrefixes = [
     'b8:27:eb', // Raspberry Pi Foundation
@@ -28,7 +28,8 @@ class ScannerService {
 
   Future<String?> getWifiIP() => _networkInfo.getWifiIP();
 
-  Stream<Device> scan() async* {
+  Stream<Device> scan({List<int>? ports}) async* {
+    final checkPorts = ports ?? _defaultPorts;
     final wifiIP = await _networkInfo.getWifiIP();
     if (wifiIP == null) {
       throw Exception('Kein WLAN verbunden. Bitte mit einem Netzwerk verbinden.');
@@ -54,7 +55,7 @@ class ScannerService {
 
     for (int i = 0; i < allIPs.length; i += _batchSize) {
       final batch = allIPs.sublist(i, min(i + _batchSize, allIPs.length));
-      final results = await Future.wait(batch.map(_checkHost));
+      final results = await Future.wait(batch.map((ip) => _checkHost(ip, checkPorts)));
 
       // ARP-Tabelle nach jedem Batch lesen — Socket-Verbindungen füllen sie
       final arpTable = await _readArpTable();
@@ -172,11 +173,11 @@ class ScannerService {
     return results;
   }
 
-  Future<Device?> _checkHost(String ip) async {
+  Future<Device?> _checkHost(String ip, List<int> ports) async {
     final openPorts = <int>[];
 
     await Future.wait(
-      _checkPorts.map((port) async {
+      ports.map((port) async {
         if (await _isPortOpen(ip, port)) openPorts.add(port);
       }),
     );

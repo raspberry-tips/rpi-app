@@ -1,0 +1,86 @@
+{
+  "@@locale": "de",
+
+  "appTitle": "raspberry.tips",
+
+  "navScanner": "Scanner",
+  "navTools": "Tools",
+  "navDevices": "Geräte",
+
+  "scannerTitle": "IP Scanner",
+  "scannerSubtitle": "raspberry.tips",
+  "stopScanTooltip": "Scan stoppen",
+  "myIp": "Deine IP: {ip}",
+  "@myIp": {
+    "placeholders": { "ip": { "type": "String" } }
+  },
+  "scanningMessage": "Suche Raspberry Pis im Netzwerk…",
+  "emptyStateMessage": "Starte einen Scan um\nRaspberry Pis zu finden",
+  "wifiHintMessage": "Dein Raspberry Pi muss im selben WLAN wie dieses Gerät sein.",
+  "scanButtonLabel": "Netzwerk scannen",
+  "rescanButtonLabel": "Erneut scannen",
+  "scanningButtonLabel": "Scanne Netzwerk…",
+  "sectionConfirmedPis": "Raspberry Pis ({count})",
+  "@sectionConfirmedPis": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "sectionPossiblePis": "Mögliche Pis ({count})",
+  "@sectionPossiblePis": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "sectionOtherDevices": "Andere Geräte ({count})",
+  "@sectionOtherDevices": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "chipConfirmedPi": "Raspberry Pi",
+  "chipPossiblePi": "Möglicher Pi?",
+  "tooltipDismiss": "Ausblenden",
+  "buttonBrowser": "Browser",
+  "buttonSsh": "SSH",
+  "tooltipSaveDevice": "Gerät speichern",
+  "deviceSavedMessage": "{name} gespeichert",
+  "@deviceSavedMessage": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "sshDialogTitle": "SSH-App benötigt",
+  "sshDialogMessage": "Für SSH wird eine SSH-App benötigt, z.B. Termius oder JuiceSSH.",
+
+  "menuPortSettings": "Port-Einstellungen",
+  "menuWebsite": "raspberry.tips",
+  "menuAbout": "Über die App",
+  "portSettingsDialogTitle": "Ports scannen",
+  "aboutDialogTitle": "Pi Scanner",
+  "aboutVersion": "Version 1.0.0",
+  "aboutDescription": "Ein einfacher IP-Scanner für Raspberry Pis im Heimnetzwerk.",
+  "aboutBy": "von raspberry.tips",
+  "buttonPrivacy": "Datenschutz",
+
+  "devicesTitle": "Meine Geräte",
+  "devicesEmptyMessage": "Noch keine Geräte gespeichert.\nNutze den Scanner um Raspberry Pis\nzu finden und zu speichern.",
+  "renameDialogTitle": "Gerät umbenennen",
+  "renameFieldLabel": "Name",
+  "deleteDialogTitle": "Gerät entfernen",
+  "deleteDialogMessage": "{name} wirklich aus der Liste entfernen?",
+  "@deleteDialogMessage": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "buttonRemove": "Entfernen",
+  "menuOpenBrowser": "Browser öffnen",
+  "menuOpenSsh": "SSH öffnen",
+  "menuRename": "Umbenennen",
+  "menuDelete": "Entfernen",
+  "deviceLastSeen": "Gesehen: {date}",
+  "@deviceLastSeen": {
+    "placeholders": { "date": { "type": "String" } }
+  },
+
+  "toolsTitle": "Tools",
+
+  "webviewOpeningMessage": "Wird im Browser geöffnet…",
+  "webviewReopenButton": "Erneut öffnen",
+  "webviewReloadTooltip": "Neu laden",
+
+  "buttonOk": "OK",
+  "buttonCancel": "Abbrechen",
+  "buttonSave": "Speichern"
+}

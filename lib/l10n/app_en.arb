@@ -1,0 +1,86 @@
+{
+  "@@locale": "en",
+
+  "appTitle": "raspberry.tips",
+
+  "navScanner": "Scanner",
+  "navTools": "Tools",
+  "navDevices": "Devices",
+
+  "scannerTitle": "IP Scanner",
+  "scannerSubtitle": "raspberry.tips",
+  "stopScanTooltip": "Stop scan",
+  "myIp": "Your IP: {ip}",
+  "@myIp": {
+    "placeholders": { "ip": { "type": "String" } }
+  },
+  "scanningMessage": "Searching for Raspberry Pis…",
+  "emptyStateMessage": "Start a scan to\nfind Raspberry Pis",
+  "wifiHintMessage": "Your Raspberry Pi must be on the same Wi-Fi as this device.",
+  "scanButtonLabel": "Scan network",
+  "rescanButtonLabel": "Scan again",
+  "scanningButtonLabel": "Scanning…",
+  "sectionConfirmedPis": "Raspberry Pis ({count})",
+  "@sectionConfirmedPis": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "sectionPossiblePis": "Possible Pis ({count})",
+  "@sectionPossiblePis": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "sectionOtherDevices": "Other devices ({count})",
+  "@sectionOtherDevices": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "chipConfirmedPi": "Raspberry Pi",
+  "chipPossiblePi": "Possible Pi?",
+  "tooltipDismiss": "Dismiss",
+  "buttonBrowser": "Browser",
+  "buttonSsh": "SSH",
+  "tooltipSaveDevice": "Save device",
+  "deviceSavedMessage": "{name} saved",
+  "@deviceSavedMessage": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "sshDialogTitle": "SSH app required",
+  "sshDialogMessage": "An SSH app is required, e.g. Termius or JuiceSSH.",
+
+  "menuPortSettings": "Port settings",
+  "menuWebsite": "raspberry.tips",
+  "menuAbout": "About",
+  "portSettingsDialogTitle": "Ports to scan",
+  "aboutDialogTitle": "Pi Scanner",
+  "aboutVersion": "Version 1.0.0",
+  "aboutDescription": "A simple IP scanner for Raspberry Pis on your home network.",
+  "aboutBy": "by raspberry.tips",
+  "buttonPrivacy": "Privacy Policy",
+
+  "devicesTitle": "My Devices",
+  "devicesEmptyMessage": "No devices saved yet.\nUse the scanner to find\nRaspberry Pis and save them.",
+  "renameDialogTitle": "Rename device",
+  "renameFieldLabel": "Name",
+  "deleteDialogTitle": "Remove device",
+  "deleteDialogMessage": "Really remove {name} from the list?",
+  "@deleteDialogMessage": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "buttonRemove": "Remove",
+  "menuOpenBrowser": "Open in browser",
+  "menuOpenSsh": "Open SSH",
+  "menuRename": "Rename",
+  "menuDelete": "Remove",
+  "deviceLastSeen": "Last seen: {date}",
+  "@deviceLastSeen": {
+    "placeholders": { "date": { "type": "String" } }
+  },
+
+  "toolsTitle": "Tools",
+
+  "webviewOpeningMessage": "Opening in browser…",
+  "webviewReopenButton": "Open again",
+  "webviewReloadTooltip": "Reload",
+
+  "buttonOk": "OK",
+  "buttonCancel": "Cancel",
+  "buttonSave": "Save"
+}

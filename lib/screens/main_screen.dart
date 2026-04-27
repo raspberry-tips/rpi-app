@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/app_localizations.dart';
 import 'devices/devices_screen.dart';
 import 'scanner/scanner_screen.dart';
 import 'tools/tools_screen.dart';
@@ -17,7 +18,6 @@ class _MainScreenState extends State<MainScreen> {
 
   void _onTabSelected(int i) {
     setState(() {
-      // Geräte-Tab neu laden wenn er geöffnet wird
       if (i == 2) _devicesRefreshKey++;
       _selectedIndex = i;
     });
@@ -25,6 +25,7 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     return Scaffold(
       body: IndexedStack(
         index: _selectedIndex,
@@ -37,21 +38,21 @@ class _MainScreenState extends State<MainScreen> {
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex,
         onDestinationSelected: _onTabSelected,
-        destinations: const [
+        destinations: [
           NavigationDestination(
-            icon: Icon(Icons.wifi_find_outlined),
-            selectedIcon: Icon(Icons.wifi_find),
-            label: 'Scanner',
+            icon: const Icon(Icons.wifi_find_outlined),
+            selectedIcon: const Icon(Icons.wifi_find),
+            label: l.navScanner,
           ),
           NavigationDestination(
-            icon: Icon(Icons.build_outlined),
-            selectedIcon: Icon(Icons.build),
-            label: 'Tools',
+            icon: const Icon(Icons.build_outlined),
+            selectedIcon: const Icon(Icons.build),
+            label: l.navTools,
           ),
           NavigationDestination(
-            icon: Icon(Icons.devices_outlined),
-            selectedIcon: Icon(Icons.devices),
-            label: 'Geräte',
+            icon: const Icon(Icons.devices_outlined),
+            selectedIcon: const Icon(Icons.devices),
+            label: l.navDevices,
           ),
         ],
       ),

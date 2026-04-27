@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../../models/tool_item.dart';
 import 'webview_screen.dart';
 
@@ -8,9 +9,10 @@ class ToolsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tools'),
+        title: Text(l.toolsTitle),
       ),
       body: ListView.separated(
         padding: const EdgeInsets.all(12),
@@ -29,6 +31,12 @@ class _ToolCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final lang = Localizations.localeOf(context).languageCode;
+    final displayName = lang == 'en' ? (tool.nameEn ?? tool.name) : tool.name;
+    final displayDesc =
+        lang == 'en' ? (tool.descriptionEn ?? tool.description) : tool.description;
+    final displayUrl = lang == 'en' ? (tool.urlEn ?? tool.url) : tool.url;
+
     return Card(
       child: ListTile(
         contentPadding:
@@ -46,15 +54,15 @@ class _ToolCard extends StatelessWidget {
           ),
         ),
         title: Text(
-          tool.name,
+          displayName,
           style: const TextStyle(fontWeight: FontWeight.w600),
         ),
-        subtitle: Text(tool.description),
+        subtitle: Text(displayDesc),
         trailing: const Icon(Icons.chevron_right),
         onTap: () => Navigator.of(context).push(
           MaterialPageRoute(
             builder: (_) =>
-                WebViewScreen(title: tool.name, url: tool.url),
+                WebViewScreen(title: displayName, url: displayUrl),
           ),
         ),
       ),

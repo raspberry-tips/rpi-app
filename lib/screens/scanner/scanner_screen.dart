@@ -3,8 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../../models/device.dart';
 import '../../services/device_storage.dart';
+import '../../services/scan_settings.dart';
 import '../../services/scanner_service.dart';
 
 class ScannerScreen extends StatefulWidget {
@@ -17,11 +19,13 @@ class ScannerScreen extends StatefulWidget {
 class _ScannerScreenState extends State<ScannerScreen> {
   final _scanner = ScannerService();
   final _storage = DeviceStorage();
+  final _settings = ScanSettings();
 
   bool _isScanning = false;
   String? _wifiIP;
   final _devices = <Device>[];
   String? _error;
+  List<int> _selectedPorts = ScanSettings.defaultPorts;
 
   StreamSubscription<Device>? _scanSubscription;
 
@@ -29,6 +33,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
   void initState() {
     super.initState();
     _loadWifiInfo();
+    _loadSettings();
   }
 
   @override
@@ -42,6 +47,11 @@ class _ScannerScreenState extends State<ScannerScreen> {
     if (mounted) setState(() => _wifiIP = ip);
   }
 
+  Future<void> _loadSettings() async {
+    final ports = await _settings.getSelectedPorts();
+    if (mounted) setState(() => _selectedPorts = ports);
+  }
+
   Future<void> _startScan() async {
     if (_isScanning) return;
     setState(() {
@@ -51,7 +61,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
     });
 
     try {
-      _scanSubscription = _scanner.scan().listen(
+      _scanSubscription = _scanner.scan(ports: _selectedPorts).listen(
         (device) {
           if (mounted) setState(() => _devices.add(device));
         },
@@ -80,6 +90,129 @@ class _ScannerScreenState extends State<ScannerScreen> {
     setState(() => _isScanning = false);
   }
 
+  Future<void> _openWebsite() async {
+    final uri = Uri.parse('https://raspberry.tips');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
+
+  Future<void> _showPortSettings() async {
+    final l = AppLocalizations.of(context)!;
+    var tempPorts = Set<int>.from(_selectedPorts);
+    bool saved = false;
+
+    await showDialog<void>(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: Text(l.portSettingsDialogTitle),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: ScanSettings.availablePorts.entries.map((entry) {
+                return CheckboxListTile(
+                  title: Text('${entry.value} (${entry.key})'),
+                  value: tempPorts.contains(entry.key),
+                  dense: true,
+                  onChanged: (checked) {
+                    setDialogState(() {
+                      if (checked == true) {
+                        tempPorts.add(entry.key);
+                      } else {
+                        tempPorts.remove(entry.key);
+                      }
+                    });
+                  },
+                );
+              }).toList(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(l.buttonCancel),
+            ),
+            FilledButton(
+              onPressed: tempPorts.isEmpty
+                  ? null
+                  : () {
+                      saved = true;
+                      Navigator.pop(context);
+                    },
+              child: Text(l.buttonSave),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (saved) {
+      final ports = tempPorts.toList()..sort();
+      await _settings.setSelectedPorts(ports);
+      if (mounted) setState(() => _selectedPorts = ports);
+    }
+  }
+
+  void _showAboutDialog() {
+    showDialog<void>(
+      context: context,
+      builder: (context) {
+        final l = AppLocalizations.of(context)!;
+        return AlertDialog(
+          title: Text(l.aboutDialogTitle),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Image.asset(
+                    'assets/icon/app_icon.png',
+                    width: 72,
+                    height: 72,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(l.aboutVersion),
+              const SizedBox(height: 4),
+              Text(l.aboutDescription),
+              const SizedBox(height: 8),
+              Text(l.aboutBy),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                Navigator.pop(context);
+                await _openWebsite();
+              },
+              child: Text(l.menuWebsite),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.pop(context);
+                final uri = Uri.parse(
+                  'https://raspberry.tips/datenschutz#7_Pi_Scanner_App',
+                );
+                if (await canLaunchUrl(uri)) {
+                  await launchUrl(uri, mode: LaunchMode.externalApplication);
+                }
+              },
+              child: Text(l.buttonPrivacy),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(l.buttonOk),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<void> _openBrowser(String ip) async {
     final uri = Uri.parse('http://$ip');
     if (await canLaunchUrl(uri)) {
@@ -95,18 +228,19 @@ class _ScannerScreenState extends State<ScannerScreen> {
       if (!mounted) return;
       showDialog<void>(
         context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('SSH-App benötigt'),
-          content: const Text(
-            'Für SSH wird eine SSH-App benötigt, z.B. Termius oder JuiceSSH.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('OK'),
-            ),
-          ],
-        ),
+        builder: (context) {
+          final l = AppLocalizations.of(context)!;
+          return AlertDialog(
+            title: Text(l.sshDialogTitle),
+            content: Text(l.sshDialogMessage),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(l.buttonOk),
+              ),
+            ],
+          );
+        },
       );
     }
   }
@@ -114,9 +248,10 @@ class _ScannerScreenState extends State<ScannerScreen> {
   Future<void> _saveDevice(Device device) async {
     await _storage.saveDevice(device);
     if (mounted) {
+      final l = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('${device.displayName} gespeichert'),
+          content: Text(l.deviceSavedMessage(device.displayName)),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -125,15 +260,16 @@ class _ScannerScreenState extends State<ScannerScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Column(
+        title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('IP Scanner'),
+            Text(l.scannerTitle),
             Text(
-              'raspberry.tips',
-              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w400),
+              l.scannerSubtitle,
+              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w400),
             ),
           ],
         ),
@@ -142,8 +278,49 @@ class _ScannerScreenState extends State<ScannerScreen> {
             IconButton(
               icon: const Icon(Icons.stop_circle_outlined),
               onPressed: _stopScan,
-              tooltip: 'Scan stoppen',
+              tooltip: l.stopScanTooltip,
             ),
+          PopupMenuButton<String>(
+            onSelected: (value) {
+              switch (value) {
+                case 'ports':
+                  _showPortSettings();
+                case 'website':
+                  _openWebsite();
+                case 'about':
+                  _showAboutDialog();
+              }
+            },
+            itemBuilder: (_) => [
+              PopupMenuItem(
+                value: 'ports',
+                child: ListTile(
+                  leading: const Icon(Icons.tune),
+                  title: Text(l.menuPortSettings),
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+              PopupMenuItem(
+                value: 'website',
+                child: ListTile(
+                  leading: const Icon(Icons.language),
+                  title: Text(l.menuWebsite),
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+              PopupMenuItem(
+                value: 'about',
+                child: ListTile(
+                  leading: const Icon(Icons.info_outline),
+                  title: Text(l.menuAbout),
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+            ],
+          ),
         ],
       ),
       body: Column(
@@ -169,6 +346,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
   }
 
   Widget _buildScanningPlaceholder() {
+    final l = AppLocalizations.of(context)!;
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -176,7 +354,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
           const CircularProgressIndicator(),
           const SizedBox(height: 16),
           Text(
-            'Suche Raspberry Pis im Netzwerk…',
+            l.scanningMessage,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Theme.of(context).colorScheme.outline,
                 ),
@@ -187,6 +365,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
   }
 
   Widget _buildEmptyState() {
+    final l = AppLocalizations.of(context)!;
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -198,7 +377,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            'Starte einen Scan um\nRaspberry Pis zu finden',
+            l.emptyStateMessage,
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   color: Theme.of(context).colorScheme.outline,
@@ -216,6 +395,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
   }
 
   Widget _buildResultsList() {
+    final l = AppLocalizations.of(context)!;
     final confirmedPis = _devices.where((d) => d.isPi && d.piConfirmed).toList();
     final possiblePis = _devices.where((d) => d.isPi && !d.piConfirmed).toList();
     final otherDevices = _devices.where((d) => !d.isPi).toList();
@@ -224,7 +404,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       children: [
         if (confirmedPis.isNotEmpty) ...[
-          _SectionHeader(label: 'Raspberry Pis (${confirmedPis.length})'),
+          _SectionHeader(label: l.sectionConfirmedPis(confirmedPis.length)),
           ...confirmedPis.map(
             (d) => _DeviceResultCard(
               device: d,
@@ -236,7 +416,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
           ),
         ],
         if (possiblePis.isNotEmpty) ...[
-          _SectionHeader(label: 'Mögliche Pis (${possiblePis.length})'),
+          _SectionHeader(label: l.sectionPossiblePis(possiblePis.length)),
           ...possiblePis.map(
             (d) => _DeviceResultCard(
               device: d,
@@ -248,7 +428,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
           ),
         ],
         if (otherDevices.isNotEmpty) ...[
-          _SectionHeader(label: 'Andere Geräte (${otherDevices.length})'),
+          _SectionHeader(label: l.sectionOtherDevices(otherDevices.length)),
           ...otherDevices.map(
             (d) => _DeviceResultCard(
               device: d,
@@ -274,6 +454,7 @@ class _HintBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 24),
       decoration: BoxDecoration(
@@ -291,7 +472,7 @@ class _HintBanner extends StatelessWidget {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              'Dein Raspberry Pi muss im selben WLAN wie dieses Gerät sein.',
+              l.wifiHintMessage,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: Theme.of(context).colorScheme.onPrimaryContainer,
                   ),
@@ -310,6 +491,7 @@ class _NetworkInfoBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (wifiIP == null) return const SizedBox.shrink();
+    final l = AppLocalizations.of(context)!;
     return Container(
       width: double.infinity,
       color: Theme.of(context).colorScheme.surfaceContainerHighest,
@@ -323,7 +505,7 @@ class _NetworkInfoBar extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           Text(
-            'Deine IP: $wifiIP',
+            l.myIp(wifiIP!),
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
@@ -379,6 +561,7 @@ class _ScanButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
       child: SizedBox(
@@ -388,10 +571,10 @@ class _ScanButton extends StatelessWidget {
           icon: const Icon(Icons.wifi_find),
           label: Text(
             isScanning
-                ? 'Scanne Netzwerk…'
+                ? l.scanningButtonLabel
                 : hasResults
-                    ? 'Erneut scannen'
-                    : 'Netzwerk scannen',
+                    ? l.rescanButtonLabel
+                    : l.scanButtonLabel,
           ),
         ),
       ),
@@ -436,6 +619,7 @@ class _DeviceResultCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l = AppLocalizations.of(context)!;
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: Padding(
@@ -464,8 +648,8 @@ class _DeviceResultCard extends StatelessWidget {
                           ),
                           if (device.isPi)
                             device.piConfirmed
-                                ? const _PiConfirmedChip()
-                                : const _PiPossibleChip(),
+                                ? _PiConfirmedChip(label: l.chipConfirmedPi)
+                                : _PiPossibleChip(label: l.chipPossiblePi),
                           IconButton(
                             icon: Icon(
                               Icons.close,
@@ -473,7 +657,7 @@ class _DeviceResultCard extends StatelessWidget {
                               color: theme.colorScheme.outline,
                             ),
                             onPressed: onDismiss,
-                            tooltip: 'Ausblenden',
+                            tooltip: l.tooltipDismiss,
                             visualDensity: VisualDensity.compact,
                             padding: EdgeInsets.zero,
                             constraints: const BoxConstraints(),
@@ -516,14 +700,14 @@ class _DeviceResultCard extends StatelessWidget {
                     device.openPorts.contains(8080))
                   _ActionButton(
                     icon: Icons.open_in_browser,
-                    label: 'Browser',
+                    label: l.buttonBrowser,
                     onPressed: onBrowser,
                   ),
                 if (device.openPorts.contains(22)) ...[
                   const SizedBox(width: 8),
                   _ActionButton(
                     icon: Icons.terminal,
-                    label: 'SSH',
+                    label: l.buttonSsh,
                     onPressed: onSSH,
                   ),
                 ],
@@ -531,7 +715,7 @@ class _DeviceResultCard extends StatelessWidget {
                 IconButton(
                   icon: const Icon(Icons.bookmark_add_outlined),
                   onPressed: onSave,
-                  tooltip: 'Gerät speichern',
+                  tooltip: l.tooltipSaveDevice,
                   color: theme.colorScheme.primary,
                 ),
               ],
@@ -577,7 +761,8 @@ class _DeviceIcon extends StatelessWidget {
 }
 
 class _PiConfirmedChip extends StatelessWidget {
-  const _PiConfirmedChip();
+  final String label;
+  const _PiConfirmedChip({required this.label});
 
   @override
   Widget build(BuildContext context) {
@@ -588,9 +773,9 @@ class _PiConfirmedChip extends StatelessWidget {
         color: const Color(0xFFC51A4A).withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(12),
       ),
-      child: const Text(
-        'Raspberry Pi',
-        style: TextStyle(
+      child: Text(
+        label,
+        style: const TextStyle(
           color: Color(0xFFC51A4A),
           fontSize: 11,
           fontWeight: FontWeight.w600,
@@ -601,7 +786,8 @@ class _PiConfirmedChip extends StatelessWidget {
 }
 
 class _PiPossibleChip extends StatelessWidget {
-  const _PiPossibleChip();
+  final String label;
+  const _PiPossibleChip({required this.label});
 
   @override
   Widget build(BuildContext context) {
@@ -612,9 +798,9 @@ class _PiPossibleChip extends StatelessWidget {
         color: Colors.orange.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(12),
       ),
-      child: const Text(
-        'Möglicher Pi?',
-        style: TextStyle(
+      child: Text(
+        label,
+        style: const TextStyle(
           color: Colors.orange,
           fontSize: 11,
           fontWeight: FontWeight.w600,

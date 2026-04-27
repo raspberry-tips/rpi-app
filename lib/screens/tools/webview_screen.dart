@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
+import '../../l10n/app_localizations.dart';
+
 class WebViewScreen extends StatefulWidget {
   final String title;
   final String url;
@@ -26,6 +28,14 @@ class _WebViewScreenState extends State<WebViewScreen> {
         ..setNavigationDelegate(NavigationDelegate(
           onPageStarted: (_) => setState(() => _isLoading = true),
           onPageFinished: (_) => setState(() => _isLoading = false),
+          onNavigationRequest: (request) {
+            final uri = Uri.parse(request.url);
+            if (uri.host.endsWith('raspberry.tips')) {
+              return NavigationDecision.navigate;
+            }
+            launchUrl(uri, mode: LaunchMode.externalApplication);
+            return NavigationDecision.prevent;
+          },
         ))
         ..loadRequest(Uri.parse(widget.url));
     } else {
@@ -42,6 +52,8 @@ class _WebViewScreenState extends State<WebViewScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
+
     if (kIsWeb) {
       return Scaffold(
         appBar: AppBar(title: Text(widget.title)),
@@ -56,14 +68,14 @@ class _WebViewScreenState extends State<WebViewScreen> {
               ),
               const SizedBox(height: 16),
               Text(
-                'Wird im Browser geöffnet…',
+                l.webviewOpeningMessage,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: 24),
               FilledButton.icon(
                 onPressed: _openInBrowser,
                 icon: const Icon(Icons.open_in_new),
-                label: const Text('Erneut öffnen'),
+                label: Text(l.webviewReopenButton),
               ),
             ],
           ),
@@ -78,7 +90,7 @@ class _WebViewScreenState extends State<WebViewScreen> {
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () => _controller?.reload(),
-            tooltip: 'Neu laden',
+            tooltip: l.webviewReloadTooltip,
           ),
         ],
       ),
