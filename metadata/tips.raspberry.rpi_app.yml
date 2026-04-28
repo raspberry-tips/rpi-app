@@ -17,13 +17,17 @@ Builds:
     versionCode: 2
     commit: v1.0.0
     srclibs:
-      - Flutter@3.27.4
+      - flutter@stable
     prebuild:
-      - $$Flutter$$/bin/flutter config --no-analytics
-      - $$Flutter$$/bin/flutter pub get
+      - git -C $$flutter$$ checkout -f 3.27.4
+      - $$flutter$$/bin/flutter config --no-analytics
+      - $$flutter$$/bin/flutter pub get
+    scandelete:
+      - .pub-cache
     build:
-      - $$Flutter$$/bin/flutter build apk --release
+      - $$flutter$$/bin/flutter build apk --release
     output: build/app/outputs/flutter-apk/app-release.apk
+    ndk: r27
 
 CurrentVersion: 1.0.0
 CurrentVersionCode: 2
