@@ -5,9 +5,9 @@ Android App zum Auffinden von Raspberry Pis im Heimnetz – plus alle Tools von 
 ## Screenshots
 
 <p align="center">
-  <img src="screenshots/scanner.jpg" width="220" alt="IP Scanner">
-  <img src="screenshots/tools.jpg" width="220" alt="Tools">
-  <img src="screenshots/geraete.jpg" width="220" alt="Meine Geräte">
+  <img src="screenshots/1777315512380.jpg" width="220" alt="IP Scanner">
+  <img src="screenshots/1777315512389.jpg" width="220" alt="Tools">
+  <img src="screenshots/1777315512398.jpg" width="220" alt="Meine Geräte">
 </p>
 
 ## Features
