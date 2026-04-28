@@ -1,16 +1,16 @@
 Pi Scanner findet Raspberry Pis automatisch im Heimnetz – per mDNS, MAC-Adress-Erkennung und Port-Scan.
 
-<b>Features</b>
-&#8226; IP Scanner – Erkennt Raspberry Pis per mDNS (raspberrypi.local / pi.local), MAC-Adressen-Präfixe und Port-Scan (SSH, HTTP, HTTPS)
-&#8226; Geräte speichern – Gefundene Pis speichern, umbenennen und per SSH oder Browser schnell erreichen
-&#8226; Tools – GPIO Pinout, WPA Supplicant Generator, Docker Compose Generator, Elektronik-Rechner u.v.m. direkt in der App
+Features:
+• IP Scanner – Erkennt Raspberry Pis per mDNS (raspberrypi.local / pi.local), MAC-Adressen-Präfixe und Port-Scan (SSH, HTTP, HTTPS)
+• Geräte speichern – Gefundene Pis speichern, umbenennen und per SSH oder Browser schnell erreichen
+• Tools – GPIO Pinout, WPA Supplicant Generator, Docker Compose Generator, Elektronik-Rechner u.v.m. direkt in der App
 
-<b>Erkennungsmethoden</b>
+Erkennungsmethoden:
 Der Scanner kombiniert mehrere Techniken für zuverlässige Ergebnisse:
-&#8226; mDNS: Erkennt Geräte sofort über raspberrypi.local / pi.local
-&#8226; MAC-Adresse: Alle bekannten Raspberry Pi OUI-Präfixe (Foundation + Trading Ltd)
-&#8226; Port-Scan: Prüft alle 254 Hosts auf SSH (22), HTTP (80/8080), HTTPS (443)
-&#8226; Reverse-DNS: PTR-Lookup zur Hostname-Auflösung
+• mDNS: Erkennt Geräte sofort über raspberrypi.local / pi.local
+• MAC-Adresse: Alle bekannten Raspberry Pi OUI-Präfixe (Foundation + Trading Ltd)
+• Port-Scan: Prüft alle 254 Hosts auf SSH (22), HTTP (80/8080), HTTPS (443)
+• Reverse-DNS: PTR-Lookup zur Hostname-Auflösung
 
 Kein Account erforderlich. Kein Tracking. Keine Werbung.
 
