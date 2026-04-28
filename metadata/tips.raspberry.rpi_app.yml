@@ -23,7 +23,7 @@ Builds:
     scandelete:
       - .pub-cache
     build: $$flutter$$/bin/flutter build apk --release
-    ndk: r27
+    ndk: r27b
 
 AutoUpdateMode: None
 UpdateCheckMode: None
