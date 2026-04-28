@@ -20,8 +20,6 @@ Builds:
       - git -C $$flutter$$ checkout -f 3.29.2
       - $$flutter$$/bin/flutter config --no-analytics
       - $$flutter$$/bin/flutter pub get
-    scandelete:
-      - .pub-cache
     build: $$flutter$$/bin/flutter build apk --release
     ndk: r27b
 
