@@ -1,0 +1,1 @@
+Added German and English language support. External links now open in the system browser.

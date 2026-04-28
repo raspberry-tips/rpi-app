@@ -1,0 +1,1 @@
+Deutsche und englische Sprachunterstützung hinzugefügt. Externe Links öffnen jetzt im System-Browser.
