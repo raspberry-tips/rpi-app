@@ -51,7 +51,10 @@ Diese Datei ist **nicht im Repo** enthalten (siehe `.gitignore`).
 
 ## Download
 
-Die App ist kostenlos auf [raspberry.tips](https://raspberry.tips/raspberry-pi-ip-scanner-app) verfügbar – demnächst auch im Google Play Store.
+Die App ist kostenlos auf [raspberry.tips](https://raspberry.tips/raspberry-pi-ip-scanner-app) verfügbar.
+
+**Google Play Beta:** Die App befindet sich derzeit im Closed Testing. Wer als Tester mitmachen möchte, kann sich unter folgendem Link anmelden:
+[play.google.com/apps/testing/tips.raspberry.rpi_app](https://play.google.com/apps/testing/tips.raspberry.rpi_app)
 
 ## Tech Stack
 
